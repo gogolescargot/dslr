@@ -6,7 +6,7 @@
 #    By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/13 11:39:15 by ggalon            #+#    #+#              #
-#    Updated: 2025/01/13 15:04:41 by ggalon           ###   ########.fr        #
+#    Updated: 2025/01/14 18:20:40 by ggalon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -62,25 +62,26 @@ with open('datasets/dataset_test.csv') as csvfile:
 			else:
 				data[col].append(float(row[i]) if row[i] else math.nan)
 
-print(' '.join(features))
+print("               ", end=" ")
+for feature in features:
+	print(f"{feature[:14]:>15}", end=" ")
+print()
 
 def print_stat(stat_name, func, is_count=False, round_val=False):
 
-	print(stat_name, end=" ")
+	print(f"{stat_name[:14]:>15}", end=" ")
 
 	for col in columns:
 		if col in ["index", "hogwarts_house", "first_name", "last_name", "birthday", "best_hand"]:
 			if is_count:
-				print(len(data[col]), end=" ")
+				print(f"{len(data[col]):>15}", end=" ")
 			else:
-				print('   ', end=" ")
+				print("               ", end=" ")
 		else:
 			value = func(data[col])
-
 			if round_val:
-				value = round(value, 2)
-
-			print(value, end=" ")
+				value = round(value, 4)
+			print(f"{value:>15}", end=" ")
 
 	print()
 
