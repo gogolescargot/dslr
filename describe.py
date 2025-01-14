@@ -6,12 +6,13 @@
 #    By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/13 11:39:15 by ggalon            #+#    #+#              #
-#    Updated: 2025/01/14 18:20:40 by ggalon           ###   ########.fr        #
+#    Updated: 2025/01/14 20:56:16 by ggalon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import csv
 import math
+import pandas as pd
 
 def count(array):
 	array = [x for x in array if not math.isnan(x)]
@@ -29,6 +30,7 @@ def std(array):
 
 def percentile(array, percent):
 	array = [x for x in array if not math.isnan(x)]
+	array.sort()
 
 	k = (len(array) - 1) * percent
 	f = math.floor(k)
@@ -42,16 +44,23 @@ def percentile(array, percent):
 
 	return d0 + d1
 
+def max_len(array):
+	max = 0
+	for elem in array:
+		if len(elem) > max:
+			max = len(elem)
+	return max
+
 columns = [
-	"index", "hogwarts_house", "first_name", "last_name", "birthday", "best_hand",
-	"arithmancy", "astronomy", "herbology", "defense_against_the_dark_arts",
-	"divination", "muggle_studies", "ancient_runes", "history_of_magic",
-	"transfiguration", "potions", "care_of_magical_creatures", "charms", "flying"
+	"Index", "Hogwarts House", "First Name", "Last Name", "Birthday", "Best Hand",
+	"Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts",
+	"Divination", "Muggle Studies", "Ancient Runes", "History of Magic",
+	"Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"
 ]
 
 data = {col: [] for col in columns}
 
-with open('datasets/dataset_test.csv') as csvfile:
+with open('datasets/dataset_train.csv') as csvfile:
 	reader = csv.reader(csvfile)
 	features = next(reader)
 	
@@ -62,34 +71,49 @@ with open('datasets/dataset_test.csv') as csvfile:
 			else:
 				data[col].append(float(row[i]) if row[i] else math.nan)
 
-print("               ", end=" ")
-for feature in features:
-	print(f"{feature[:14]:>15}", end=" ")
-print()
+stat_len = 7
 
-def print_stat(stat_name, func, is_count=False, round_val=False):
+def print_stat(stat_name, func, round_val=False):
 
-	print(f"{stat_name[:14]:>15}", end=" ")
+	print(f"{stat_name:<{stat_len}}", end="  ")
 
-	for col in columns:
-		if col in ["index", "hogwarts_house", "first_name", "last_name", "birthday", "best_hand"]:
-			if is_count:
-				print(f"{len(data[col]):>15}", end=" ")
-			else:
-				print("               ", end=" ")
-		else:
-			value = func(data[col])
-			if round_val:
-				value = round(value, 4)
-			print(f"{value:>15}", end=" ")
+	for i, col in enumerate(columns[6:]):
+		value = func(data[col])
+
+		if round_val:
+			value = round(value, 6)
+
+		print(f"{value:>{feature_len[i]}}", end="  ")
 
 	print()
 
-print_stat('Count', lambda x: count(x), is_count=True, round_val=False)
-print_stat('Mean', lambda x: mean(x), round_val=True)
-print_stat('Std', lambda x: std(x), round_val=True)
-print_stat('Min', lambda x: min(x), round_val=True)
+feature_len = []
+
+print(' ' * stat_len, end="  ")
+
+for feature in columns[6:]:
+	if (len(feature) < 12):
+		value = 12
+	else:
+		value = len(feature)
+
+	feature_len.append(value)
+	print(f"{feature:>{value}}", end="  ")
+	
+print()
+
+print_stat('count', lambda x: count(x), round_val=False)
+print_stat('mean', lambda x: mean(x), round_val=True)
+print_stat('std', lambda x: std(x), round_val=True)
+print_stat('min', lambda x: min(x), round_val=True)
 print_stat('25%', lambda x: percentile(x, 0.25), round_val=True)
 print_stat('50%', lambda x: percentile(x, 0.50), round_val=True)
 print_stat('75%', lambda x: percentile(x, 0.75), round_val=True)
-print_stat('Max', lambda x: max(x), round_val=True)
+print_stat('max', lambda x: max(x), round_val=True)
+
+
+df = pd.read_csv('datasets/dataset_train.csv')
+
+summary = df.describe()
+
+print(summary)
