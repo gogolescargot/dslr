@@ -6,7 +6,7 @@
 #    By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/13 11:39:15 by ggalon            #+#    #+#              #
-#    Updated: 2025/01/14 20:56:16 by ggalon           ###   ########.fr        #
+#    Updated: 2025/01/15 14:52:54 by ggalon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,31 +45,21 @@ def percentile(array, percent):
 	return d0 + d1
 
 def max_len(array):
-	max = 0
-	for elem in array:
-		if len(elem) > max:
-			max = len(elem)
-	return max
+	array.index(max(array, key=len))
 
-columns = [
-	"Index", "Hogwarts House", "First Name", "Last Name", "Birthday", "Best Hand",
-	"Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts",
-	"Divination", "Muggle Studies", "Ancient Runes", "History of Magic",
-	"Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"
-]
-
-data = {col: [] for col in columns}
 
 with open('datasets/dataset_train.csv') as csvfile:
 	reader = csv.reader(csvfile)
 	features = next(reader)
-	
+
+	data = {feature: [] for feature in features}
+
 	for row in reader:
-		for i, col in enumerate(columns):
+		for i, feature in enumerate(features):
 			if i < 6:
-				data[col].append(row[i])
+				data[feature].append(row[i])
 			else:
-				data[col].append(float(row[i]) if row[i] else math.nan)
+				data[feature].append(float(row[i]) if row[i] else math.nan)
 
 stat_len = 7
 
@@ -77,7 +67,7 @@ def print_stat(stat_name, func, round_val=False):
 
 	print(f"{stat_name:<{stat_len}}", end="  ")
 
-	for i, col in enumerate(columns[6:]):
+	for i, col in enumerate(features[6:]):
 		value = func(data[col])
 
 		if round_val:
@@ -91,7 +81,7 @@ feature_len = []
 
 print(' ' * stat_len, end="  ")
 
-for feature in columns[6:]:
+for feature in features[6:]:
 	if (len(feature) < 12):
 		value = 12
 	else:
