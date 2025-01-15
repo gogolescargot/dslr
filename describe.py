@@ -6,7 +6,7 @@
 #    By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/13 11:39:15 by ggalon            #+#    #+#              #
-#    Updated: 2025/01/15 14:52:54 by ggalon           ###   ########.fr        #
+#    Updated: 2025/01/15 18:00:37 by ggalon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,66 +44,81 @@ def percentile(array, percent):
 
 	return d0 + d1
 
-def max_len(array):
-	array.index(max(array, key=len))
+
+def read_csv(path):
+	with open(path) as csvfile:
+		reader = csv.reader(csvfile)
+		features = next(reader)
+		data = {feature: [] for feature in features}
+
+		for row in reader:
+			for i, feature in enumerate(features):
+				if i < 6:
+					data[feature].append(row[i])
+				else:
+					data[feature].append(float(row[i]) if row[i] else math.nan)
+	return features, data
 
 
-with open('datasets/dataset_train.csv') as csvfile:
-	reader = csv.reader(csvfile)
-	features = next(reader)
+def compute_stats(features: list, data: dict):
+	stats = {
+		'count': [],
+		'mean': [],
+		'std': [],
+		'min': [],
+		'25%': [],
+		'50%': [],
+		'75%': [],
+		'max': []
+	}
 
-	data = {feature: [] for feature in features}
+	for feature in features[6:]:
+		column_data = data[feature]
+		stats['count'].append(count(column_data))
+		stats['mean'].append(mean(column_data))
+		stats['std'].append(std(column_data))
+		stats['min'].append(min(column_data))
+		stats['25%'].append(percentile(column_data, 0.25))
+		stats['50%'].append(percentile(column_data, 0.50))
+		stats['75%'].append(percentile(column_data, 0.75))
+		stats['max'].append(max(column_data))
+	
+	return stats
 
-	for row in reader:
-		for i, feature in enumerate(features):
-			if i < 6:
-				data[feature].append(row[i])
-			else:
-				data[feature].append(float(row[i]) if row[i] else math.nan)
 
-stat_len = 7
+def print_statistics(features: list, stats: dict, round_value=False):
+	stat_len = len( max( stats.keys(), key=len ) )
+	feature_len = []
 
-def print_stat(stat_name, func, round_val=False):
-
-	print(f"{stat_name:<{stat_len}}", end="  ")
-
-	for i, col in enumerate(features[6:]):
-		value = func(data[col])
-
-		if round_val:
-			value = round(value, 6)
-
-		print(f"{value:>{feature_len[i]}}", end="  ")
-
+	print(' ' * stat_len, end="  ")
+	for i, feature in enumerate(features[6:]):
+		if (round_value):
+			value_len = max([len(str(round(stats[stat][i], 6))) for stat in stats] + [len(feature)])
+		else:
+			value_len = max([len(str(stats[stat][i])) for stat in stats] + [len(feature)])
+		feature_len.append(value_len)
+		print(f"{feature:>{value_len}}", end="  ")
 	print()
 
-feature_len = []
+	for stat_name, values in stats.items():
+		print(f"{stat_name:<{stat_len}}", end="  ")
+		for i, value in enumerate(values):
+			if (round_value):
+				print(f"{round(value, 6):>{feature_len[i]}}", end="  ")
+			else:
+				print(f"{value:>{feature_len[i]}}", end="  ")
+		print()
 
-print(' ' * stat_len, end="  ")
+def main():
+	file_path = 'datasets/dataset_train.csv'
 
-for feature in features[6:]:
-	if (len(feature) < 12):
-		value = 12
-	else:
-		value = len(feature)
+	features, data = read_csv(file_path)
+	stats = compute_stats(features, data)
+	print_statistics(features, stats, round_value=True)
 
-	feature_len.append(value)
-	print(f"{feature:>{value}}", end="  ")
-	
-print()
+	df = pd.read_csv(file_path)
+	summary = df.describe()
+	print(summary)
 
-print_stat('count', lambda x: count(x), round_val=False)
-print_stat('mean', lambda x: mean(x), round_val=True)
-print_stat('std', lambda x: std(x), round_val=True)
-print_stat('min', lambda x: min(x), round_val=True)
-print_stat('25%', lambda x: percentile(x, 0.25), round_val=True)
-print_stat('50%', lambda x: percentile(x, 0.50), round_val=True)
-print_stat('75%', lambda x: percentile(x, 0.75), round_val=True)
-print_stat('max', lambda x: max(x), round_val=True)
-
-
-df = pd.read_csv('datasets/dataset_train.csv')
-
-summary = df.describe()
-
-print(summary)
+if __name__ == "__main__":
+	main()
