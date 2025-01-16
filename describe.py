@@ -6,13 +6,13 @@
 #    By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/13 11:39:15 by ggalon            #+#    #+#              #
-#    Updated: 2025/01/15 18:00:37 by ggalon           ###   ########.fr        #
+#    Updated: 2025/01/16 15:38:25 by ggalon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import csv
 import math
-import pandas as pd
+# import pandas as pd
 
 def count(array):
 	array = [x for x in array if not math.isnan(x)]
@@ -116,9 +116,9 @@ def main():
 	stats = compute_stats(features, data)
 	print_statistics(features, stats, round_value=True)
 
-	df = pd.read_csv(file_path)
-	summary = df.describe()
-	print(summary)
+	# df = pd.read_csv(file_path)
+	# summary = df.describe()
+	# print(summary)
 
 if __name__ == "__main__":
 	main()
