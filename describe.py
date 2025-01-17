@@ -1,18 +1,47 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    describe.py                                        :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/01/13 11:39:15 by ggalon            #+#    #+#              #
-#    Updated: 2025/01/16 15:38:25 by ggalon           ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+#!/usr/bin/python3
 
 import csv
 import math
+import click
 # import pandas as pd
+
+def check_csv(features, data):
+	data_frame_keys = {
+		'Index': str,
+		'Hogwarts House': object,
+		'First Name': object,
+		'Last Name': object,
+		'Birthday': object,
+		'Best Hand': object,
+		'Arithmancy': float,
+		'Astronomy': float,
+		'Herbology': float,
+		'Defense Against the Dark Arts': float,
+		'Divination': float,
+		'Muggle Studies': float,
+		'Ancient Runes': float,
+		'History of Magic': float,
+		'Transfiguration': float,
+		'Potions': float,
+		'Care of Magical Creatures': float,
+		'Charms': float,
+		'Flying': float
+	}
+
+	if features != list(data_frame_keys.keys()):
+		raise Exception("CSV Error: Wrong columns")
+	
+	for col, dtype in data_frame_keys.items():
+		i = 0
+		for elem in data[col]:
+			if not isinstance(elem, dtype):
+				raise Exception(f"CSV Error: wrong element type: find in {col}: type {type(elem)}, expected {dtype}")
+			if col == 'Hogwarts House' and elem not in ['Ravenclaw', 'Slytherin', 'Hufflepuff', 'Gryffindor']:
+				raise Exception(f"CSV Error: wrong hogwarts house: line {i}, find {elem}, expected Ravenclaw, Slytherin, Hufflepuff or Gryffindor")
+			if col == 'Best Hand' and elem not in ['Left', 'Right']:
+				raise Exception(f"CSV Error: wrong best hand: line {i}, find {elem}, expected Left or Right")
+			i += 1
+	return 0
 
 def count(array):
 	array = [x for x in array if not math.isnan(x)]
@@ -109,12 +138,14 @@ def print_statistics(features: list, stats: dict, round_value=False):
 				print(f"{value:>{feature_len[i]}}", end="  ")
 		print()
 
-def main():
-	file_path = 'datasets/dataset_train.csv'
-
-	features, data = read_csv(file_path)
+@click.command()
+@click.option('--path', default="datasets/dataset_train.csv", help="Path of the CSV data file")
+@click.option('--round', default=True, help="Round value in the table")
+def main(path, round):
+	features, data = read_csv(path)
+	check_csv(features, data)
 	stats = compute_stats(features, data)
-	print_statistics(features, stats, round_value=True)
+	print_statistics(features, stats, round_value=bool(round))
 
 	# df = pd.read_csv(file_path)
 	# summary = df.describe()

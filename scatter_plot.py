@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
-import pandas as pd
+from itertools import combinations
 import seaborn as sb
+import pandas as pd
 import matplotlib.pyplot as plt
 import click
 
@@ -49,11 +50,11 @@ def main(path):
 
 	check_csv(data_frame)
 
-	for course in data_frame.keys()[5:]:
-		sb.histplot(data=data_frame, x=course, hue="Hogwarts House", multiple="stack", stat="count")
-		plt.title(f"Histogram of {course} Scores by Hogwarts House")
-		plt.xlabel(f"{course} Score")
-		plt.ylabel("Count")
+	for course_1, course_2 in combinations(data_frame.keys()[5:], 2):
+		sb.scatterplot(data=data_frame, x=data_frame[course_1], y=data_frame[course_2], hue="Hogwarts House")
+		plt.title(f"Scatter Plot of {course_1} and {course_2}")
+		plt.xlabel(f"{course_1} Score")
+		plt.ylabel(f"{course_2} Score")
 		plt.show()
 
 if __name__ == '__main__':
