@@ -53,7 +53,7 @@ def main(path):
 
 	data_frame.rename(columns=data_frame_keys, inplace=True)
 
-	pair_plot = sns.pairplot(data=data_frame, hue="Hogwarts House", diag_kind='hist', diag_kws={'multiple': 'stack'})
+	pair_plot = sns.pairplot(data=data_frame, hue="Hogwarts House", diag_kind='hist', plot_kws={"size": 3}, diag_kws={'multiple': 'stack'})
 
 	new_labels = [house[:5] for house in set(data_frame["Hogwarts House"])]
 
