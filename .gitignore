@@ -188,3 +188,4 @@ cython_debug/
 .pypirc
 
 houses.csv
+weights.pkl

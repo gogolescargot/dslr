@@ -1,5 +1,6 @@
 import csv
 import pickle as pkl
+import click
 import pandas as pd
 
 import numpy as np
@@ -61,22 +62,36 @@ def csv_write(path, X, predictions):
             writer.writerow([i, houses[predictions[i]]])
 
 
-def main():
+@click.command()
+@click.option(
+    "--path",
+    default="datasets/dataset_test.csv",
+    help="Path of the CSV data file",
+)
+@click.option(
+    "--weights",
+    default="weights.pkl",
+    help="Path of the weights file",
+)
+def main(path, weights):
     try:
-        X = load_data("datasets/dataset_test.csv")
+        X = load_data(path)
 
-        with open("thetas.pkl", "rb") as file:
+        with open(weights, "rb") as file:
             data = pkl.load(file)
-        thetas = data
+
+        thetas = data["thetas"]
+        X_min = data["X_min"]
+        X_max = data["X_max"]
 
         X = np.nan_to_num(X, nan=0.0)
-        X_min = X.min(axis=0)
-        X_max = X.max(axis=0)
         X = (X - X_min) / (X_max - X_min)
 
         predictions = predict(X, thetas)
 
         csv_write("houses.csv", X, predictions)
+
+        print("Predictions saved to 'houses.csv' successfully.")
 
     except FileNotFoundError:
         print("Error: The file 'data.pkl' was not found.")

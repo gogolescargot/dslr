@@ -35,7 +35,8 @@ def check_csv(features, data):
         for elem in data[col]:
             if not isinstance(elem, dtype):
                 raise Exception(
-                    f"CSV Error: wrong element type: find in {col}: type {type(elem)}, expected {dtype}"
+                    f"CSV Error: wrong element type: find in {col}: \
+type {type(elem)}, expected {dtype}"
                 )
             if col == "Hogwarts House" and elem not in [
                 "Ravenclaw",
@@ -44,11 +45,13 @@ def check_csv(features, data):
                 "Gryffindor",
             ]:
                 raise Exception(
-                    f"CSV Error: wrong hogwarts house: line {i}, find {elem}, expected Ravenclaw, Slytherin, Hufflepuff or Gryffindor"
+                    f"CSV Error: wrong hogwarts house: line {i}, find {elem}, \
+expected Ravenclaw, Slytherin, Hufflepuff or Gryffindor"
                 )
             if col == "Best Hand" and elem not in ["Left", "Right"]:
                 raise Exception(
-                    f"CSV Error: wrong best hand: line {i}, find {elem}, expected Left or Right"
+                    f"CSV Error: wrong best hand: line {i}, \
+find {elem}, expected Left or Right"
                 )
             i += 1
     return 0

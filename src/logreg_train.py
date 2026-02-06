@@ -46,7 +46,7 @@ def normalize(X, y):
     X_max = X.max(axis=0)
     X = (X - X_min) / (X_max - X_min)
 
-    return X, y
+    return X, y, X_min, X_max
 
 
 def sigmoid(z):
@@ -63,7 +63,7 @@ def gradient(X, y, m, prediction):
     return np.dot(X.T, prediction - y) / m
 
 
-def log_reg(X, y, learning_rate=0.01, max_iterations=10000):
+def log_reg(X, y, learning_rate, max_iterations):
     m, n = X.shape
     theta = np.zeros(n)
     old_cost = 0
@@ -79,13 +79,13 @@ def log_reg(X, y, learning_rate=0.01, max_iterations=10000):
 
         old_cost = cost_value
 
-        if i % 1000 == 0:
+        if i % 10 == 0:
             print(f"Iteration {i}, Cost: {cost_value}")
 
     return theta
 
 
-def one_vs_all(X, y, learning_rate=0.1, max_iterations=1000):
+def one_vs_all(X, y, learning_rate, max_iterations):
     _, n = X.shape
     thetas = np.zeros((4, n))
     for i in range(4):
@@ -102,16 +102,20 @@ def one_vs_all(X, y, learning_rate=0.1, max_iterations=1000):
     help="Path of the CSV data file",
 )
 @click.option("--lrnrt", default=0.1, help="Learning rate")
-@click.option("--maxit", default=1000, help="Maximum number of iterations")
+@click.option("--maxit", default=200, help="Maximum number of iterations")
 def main(path, lrnrt, maxit):
     try:
         X, y = get_data(path)
-        X, y = normalize(X, y)
+        X, y, X_min, X_max = normalize(X, y)
 
         thetas = one_vs_all(X, y, learning_rate=lrnrt, max_iterations=maxit)
 
-        with open("thetas.pkl", "wb") as file:
-            pkl.dump(thetas, file)
+        with open("weights.pkl", "wb") as file:
+            pkl.dump({"thetas": thetas, "X_min": X_min, "X_max": X_max}, file)
+
+        print(
+            "Training completed and weights saved to 'weights.pkl' successfully."
+        )
 
     except FileNotFoundError:
         print(f"Error: The file at path '{path}' was not found.")
