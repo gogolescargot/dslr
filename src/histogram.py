@@ -1,11 +1,9 @@
-#!/usr/bin/python3
-
 import signal
 
 import click
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
+import seaborn as sb
 
 
 def check_csv(data_frame):
@@ -73,46 +71,26 @@ def main(path):
             ),
         )
         data_frame = pd.read_csv(path, index_col="Index")
-
         check_csv(data_frame)
 
-        data_frame_keys = {key: key[:5] for key in data_frame.keys()[5:]}
-
-        data_frame.rename(columns=data_frame_keys, inplace=True)
-
-        pair_plot = sns.pairplot(
-            data=data_frame,
-            hue="Hogwarts House",
-            diag_kind="hist",
-            plot_kws={"size": 3},
-            diag_kws={"multiple": "stack"},
-        )
-
-        new_labels = [house[:5] for house in set(data_frame["Hogwarts House"])]
-
-        for text, label in zip(pair_plot._legend.texts, new_labels):
-            text.set_text(label)
-
-        sns.move_legend(
-            pair_plot, "center right", ncol=1, title=None, frameon=False
-        )
-
-        for ax in pair_plot.axes.flatten():
-            ax.set_xticks([])
-            ax.set_yticks([])
-
-        plt.show()
-
+        for course in data_frame.keys()[5:]:
+            sb.histplot(
+                data=data_frame,
+                x=course,
+                hue="Hogwarts House",
+                multiple="stack",
+                stat="count",
+            )
+            plt.title(f"Histogram of {course} Scores by Hogwarts House")
+            plt.xlabel(f"{course} Score")
+            plt.ylabel("Count")
+            plt.show()
     except FileNotFoundError:
-        print(f"Error: The file at path '{path}' was not found.")
+        print(f"Error: File not found at path '{path}'")
     except pd.errors.EmptyDataError:
-        print(f"Error: The file at path '{path}' is empty or invalid.")
-    except KeyError as e:
-        print(f"Error: Missing key in the data file: {e}")
-    except ValueError as e:
-        print(f"ValueError: {e}")
+        print("Error: The CSV file is empty")
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print(f"An error occurred: {e}")
 
 
 if __name__ == "__main__":

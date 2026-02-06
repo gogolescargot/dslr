@@ -1,12 +1,9 @@
-#!/usr/bin/python3
-
 import signal
-from itertools import combinations
 
 import click
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sb
+import seaborn as sns
 
 
 def check_csv(data_frame):
@@ -73,22 +70,36 @@ def main(path):
                 exit(1),
             ),
         )
-
         data_frame = pd.read_csv(path, index_col="Index")
 
         check_csv(data_frame)
 
-        for course_1, course_2 in combinations(data_frame.keys()[5:], 2):
-            sb.scatterplot(
-                data=data_frame,
-                x=data_frame[course_1],
-                y=data_frame[course_2],
-                hue="Hogwarts House",
-            )
-            plt.title(f"Scatter Plot of {course_1} and {course_2}")
-            plt.xlabel(f"{course_1} Score")
-            plt.ylabel(f"{course_2} Score")
-            plt.show()
+        data_frame_keys = {key: key[:5] for key in data_frame.keys()[5:]}
+
+        data_frame.rename(columns=data_frame_keys, inplace=True)
+
+        pair_plot = sns.pairplot(
+            data=data_frame,
+            hue="Hogwarts House",
+            diag_kind="hist",
+            plot_kws={"size": 3},
+            diag_kws={"multiple": "stack"},
+        )
+
+        new_labels = [house[:5] for house in set(data_frame["Hogwarts House"])]
+
+        for text, label in zip(pair_plot._legend.texts, new_labels):
+            text.set_text(label)
+
+        sns.move_legend(
+            pair_plot, "center right", ncol=1, title=None, frameon=False
+        )
+
+        for ax in pair_plot.axes.flatten():
+            ax.set_xticks([])
+            ax.set_yticks([])
+
+        plt.show()
 
     except FileNotFoundError:
         print(f"Error: The file at path '{path}' was not found.")

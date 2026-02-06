@@ -1,13 +1,34 @@
-#!/usr/bin/python3
-
 import csv
 import pickle as pkl
+import pandas as pd
 
 import numpy as np
 
 
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
+
+
+def load_data(path):
+    data_frame = pd.read_csv(path, index_col="Index")
+    X = data_frame[
+        [
+            "Arithmancy",
+            "Astronomy",
+            "Herbology",
+            "Defense Against the Dark Arts",
+            "Divination",
+            "Muggle Studies",
+            "Ancient Runes",
+            "History of Magic",
+            "Transfiguration",
+            "Potions",
+            "Care of Magical Creatures",
+            "Charms",
+            "Flying",
+        ]
+    ].values
+    return X
 
 
 def predict(X, thetas):
@@ -42,11 +63,16 @@ def csv_write(path, X, predictions):
 
 def main():
     try:
-        with open("data.pkl", "rb") as file:
-            data = pkl.load(file)
+        X = load_data("datasets/dataset_test.csv")
 
-        X = data["X"]
-        thetas = data["thetas"]
+        with open("thetas.pkl", "rb") as file:
+            data = pkl.load(file)
+        thetas = data
+
+        X = np.nan_to_num(X, nan=0.0)
+        X_min = X.min(axis=0)
+        X_max = X.max(axis=0)
+        X = (X - X_min) / (X_max - X_min)
 
         predictions = predict(X, thetas)
 

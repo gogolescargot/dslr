@@ -1,8 +1,13 @@
-#!/usr/bin/python3
-
 import signal
+from itertools import combinations
 
 import click
+import matplotlib
+
+try:
+    matplotlib.use("qtagg")
+except Exception:
+    pass
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sb
@@ -72,27 +77,33 @@ def main(path):
                 exit(1),
             ),
         )
+
         data_frame = pd.read_csv(path, index_col="Index")
+
         check_csv(data_frame)
 
-        for course in data_frame.keys()[5:]:
-            sb.histplot(
+        for course_1, course_2 in combinations(data_frame.keys()[5:], 2):
+            sb.scatterplot(
                 data=data_frame,
-                x=course,
+                x=data_frame[course_1],
+                y=data_frame[course_2],
                 hue="Hogwarts House",
-                multiple="stack",
-                stat="count",
             )
-            plt.title(f"Histogram of {course} Scores by Hogwarts House")
-            plt.xlabel(f"{course} Score")
-            plt.ylabel("Count")
+            plt.title(f"Scatter Plot of {course_1} and {course_2}")
+            plt.xlabel(f"{course_1} Score")
+            plt.ylabel(f"{course_2} Score")
             plt.show()
+
     except FileNotFoundError:
-        print(f"Error: File not found at path '{path}'")
+        print(f"Error: The file at path '{path}' was not found.")
     except pd.errors.EmptyDataError:
-        print("Error: The CSV file is empty")
+        print(f"Error: The file at path '{path}' is empty or invalid.")
+    except KeyError as e:
+        print(f"Error: Missing key in the data file: {e}")
+    except ValueError as e:
+        print(f"ValueError: {e}")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An unexpected error occurred: {e}")
 
 
 if __name__ == "__main__":

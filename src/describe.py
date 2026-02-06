@@ -1,11 +1,7 @@
-#!/usr/bin/python3
-
 import csv
 import math
 
 import click
-
-# import pandas as pd
 
 
 def check_csv(features, data):
@@ -181,10 +177,6 @@ def main(path, round):
         print(f"ValueError: {e}")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
-
-    # df = pd.read_csv(file_path)
-    # summary = df.describe()
-    # print(summary)
 
 
 if __name__ == "__main__":

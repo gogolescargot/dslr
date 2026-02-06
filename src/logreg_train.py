@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import pickle as pkl
 
 import click
@@ -104,7 +102,7 @@ def one_vs_all(X, y, learning_rate=0.1, max_iterations=1000):
     help="Path of the CSV data file",
 )
 @click.option("--lrnrt", default=0.1, help="Learning rate")
-@click.option("--maxit", default=10000, help="Learning rate")
+@click.option("--maxit", default=1000, help="Maximum number of iterations")
 def main(path, lrnrt, maxit):
     try:
         X, y = get_data(path)
@@ -112,10 +110,8 @@ def main(path, lrnrt, maxit):
 
         thetas = one_vs_all(X, y, learning_rate=lrnrt, max_iterations=maxit)
 
-        data = {"X": X, "thetas": thetas}
-
-        with open("data.pkl", "wb") as file:
-            pkl.dump(data, file)
+        with open("thetas.pkl", "wb") as file:
+            pkl.dump(thetas, file)
 
     except FileNotFoundError:
         print(f"Error: The file at path '{path}' was not found.")
