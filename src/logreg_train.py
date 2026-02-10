@@ -114,7 +114,8 @@ def main(path, lrnrt, maxit):
             pkl.dump({"thetas": thetas, "X_min": X_min, "X_max": X_max}, file)
 
         print(
-            "Training completed and weights saved to 'weights.pkl' successfully."
+            "Training completed \
+and weights saved to 'weights.pkl' successfully."
         )
 
     except FileNotFoundError:

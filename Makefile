@@ -34,6 +34,26 @@ requirements: venv
 	$(PIP) install -r requirements.txt
 	@echo
 
+describe:
+	@echo "Describing dataset..."
+	$(PYBIN) src/describe.py
+	@echo
+
+histogram:
+	@echo "Generating histogram..."
+	$(PYBIN) src/histogram.py
+	@echo
+
+scatterplot:
+	@echo "Generating scatter plot..."
+	$(PYBIN) src/scatter_plot.py
+	@echo
+
+pairplot:
+	@echo "Generating pair plot..."
+	$(PYBIN) src/pair_plot.py
+	@echo
+
 train:
 	@echo "Training model..."
 	$(PYBIN) src/logreg_train.py

@@ -57,6 +57,14 @@ find {elem}, expected Left or Right"
     return 0
 
 
+def sum(array):
+    array = [x for x in array if not math.isnan(x)]
+    total = 0
+    for num in array:
+        total += num
+    return total
+
+
 def count(array):
     array = [x for x in array if not math.isnan(x)]
     return len(array)
