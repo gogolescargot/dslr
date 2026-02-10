@@ -44,7 +44,9 @@ def normalize(X, y):
 
     X_min = X.min(axis=0)
     X_max = X.max(axis=0)
-    X = (X - X_min) / (X_max - X_min)
+    denom = X_max - X_min
+    denom[denom == 0] = 1.0
+    X = (X - X_min) / denom
 
     return X, y, X_min, X_max
 
